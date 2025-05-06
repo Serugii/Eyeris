@@ -1,0 +1,51 @@
+<body class="min-h-screen bg-gray-100 text-gray-900">
+  <div class="max-w-md mx-auto mt-10 bg-white p-8 rounded shadow min-h-[550px] flex flex-col justify-between">
+    <div class="text-xl font-bold text-center mb-4 hover:underline"><%= link_to 'Eyeris', root_path %></div>
+    <div>
+      <h2 class="text-3xl text-green-600 font-bold mb-6 text-center">
+        <%= t("devise.registrations.new.title", default: "Реєстрація") %>
+      </h2>
+
+      <%= form_for(resource, as: resource_name, url: registration_path(resource_name)) do |f| %>
+        <%= render "devise/shared/error_messages", resource: resource %>
+        <div class="mb-4">
+          <%= f.label :email, t("label.user.email"), class: "block text-sm font-medium text-gray-700" %>
+          <%= f.email_field :email, autofocus: true, autocomplete: "email",
+              class: "mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500" %>
+        </div>
+
+        <div class="mb-4">
+          <%= f.label :password, t("label.user.password"), class: "block text-sm font-medium text-gray-700" %>
+          <% if @minimum_password_length %>
+            <p class="text-xs text-gray-500 mb-1">
+              (<%= t("devise.registrations.new.password_minimum", count: @minimum_password_length, default: "%{count} символів мінімум") %>)
+            </p>
+          <% end %>
+          <%= f.password_field :password, autocomplete: "new-password", id: "registration_password",
+              class: "mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500" %>
+        </div>
+
+        <div class="mb-4">
+          <%= f.label :password_confirmation, t("label.user.password_confirmation"), class: "block text-sm font-medium text-gray-700" %>
+          <%= f.password_field :password_confirmation, autocomplete: "new-password", id: "registration_password_confirmation",
+              class: "mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500" %>
+        </div>
+
+        <div class="flex items-center mb-4">
+          <input type="checkbox" id="show_registration_password" class="mr-2"
+                onclick="togglePasswordVisibility('registration_password'); togglePasswordVisibility('registration_password_confirmation')">
+          <label for="show_registration_password" class="text-sm text-gray-600">Показати пароль</label>
+        </div>
+
+        <div class="mb-6">
+          <%= f.submit t("devise.registrations.new.submit", default: "Зареєструватися"),
+              class: "w-full bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded font-semibold" %>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="text-center mt-4">
+      <%= render "devise/shared/links" %>
+    </div>
+  </div>
+</body>

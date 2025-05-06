@@ -1,0 +1,53 @@
+<body class="min-h-screen bg-gray-100 text-gray-900">
+  <div class="max-w-md mx-auto mt-10 bg-white p-8 rounded shadow min-h-[550px] flex flex-col justify-between">
+    <div class="text-xl font-bold text-center mb-4 hover:underline"><%= link_to 'Eyeris', root_path %></div>
+    <div>
+      <h2 class="text-3xl text-blue-600 font-bold mb-6 text-center">
+        <%= t("devise.sessions.new.title", default: "Вхід") %>
+      </h2>
+      <% if flash[:alert] %>
+        <div id="error_explanation" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+          <strong class="font-bold">Помилки:</strong>
+          <ul class="list-disc list-inside">
+            <li><%= flash[:alert] %></li>
+          </ul>
+        </div>
+      <% end %>
+      <%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
+        <%= render "devise/shared/error_messages", resource: resource %>
+        <div class="mb-4">
+          <%= f.label :email, t("label.user.email"), class: "block text-sm font-medium text-gray-700" %>
+          <%= f.email_field :email, autofocus: true, autocomplete: "email",
+              class: "mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" %>
+        </div>
+
+        <div class="mb-4">
+          <%= f.label :password, t("label.user.password"), class: "block text-sm font-medium text-gray-700" %>
+          <%= f.password_field :password, autocomplete: "current-password", id: "login_password",
+              class: "mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" %>
+        </div>
+
+        <% if devise_mapping.rememberable? %>
+          <div class="flex items-center mb-4">
+            <%= f.check_box :remember_me, class: "mr-2" %>
+            <%= f.label :remember_me, t("label.user.remember_me"), class: "text-sm text-gray-600" %>
+          </div>
+        <% end %>
+
+        <div class="flex items-center mb-4">
+          <input type="checkbox" id="show_login_password" class="mr-2" onclick="togglePasswordVisibility('login_password')">
+          <label for="show_login_password" class="text-sm text-gray-600">Показати пароль</label>
+        </div>
+
+
+        <div class="mb-6">
+          <%= f.submit "Увійти", class: "w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded font-semibold" %>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="text-center mt-4">
+      <%= render "devise/shared/links" %>
+    </div>
+  </div>
+</body>

@@ -1,0 +1,42 @@
+<body class="min-h-screen bg-gray-100 text-gray-900">
+  <div class="max-w-md mx-auto mt-10 bg-white p-8 rounded shadow min-h-[550px] flex flex-col justify-between">
+    <div class="text-xl font-bold text-center mb-4 hover:underline">
+      <%= link_to 'Eyeris', root_path %>
+    </div>
+
+    <div>
+      <h2 class="text-3xl text-purple-600 font-bold mb-6 text-center">
+        <%= t("devise.passwords.edit.title", default: "Зміна пароля") %>
+      </h2>
+
+      <%= form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :put }) do |f| %>
+        <%= render "devise/shared/error_messages", resource: resource %>
+        <%= f.hidden_field :reset_password_token %>
+
+        <div class="mb-4">
+          <%= f.label :password, t("label.user.password"), class: "block text-sm font-medium text-gray-700" %>
+          <% if @minimum_password_length %>
+            <em class="text-sm text-gray-500">(<%= t("devise.sessions.registrations.new.password_minimum", count: @minimum_password_length, default: "(мінімум %{count} символів)") %>)</em>
+          <% end %>
+          <%= f.password_field :password, autofocus: true, autocomplete: "new-password",
+              class: "mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500" %>
+        </div>
+
+        <div class="mb-4">
+          <%= f.label :password_confirmation, t("label.user.password_confirmation"), class: "block text-sm font-medium text-gray-700" %>
+          <%= f.password_field :password_confirmation, autocomplete: "new-password",
+              class: "mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500" %>
+        </div>
+
+        <div class="mb-6">
+          <%= f.submit t("devise.passwords.edit.submit", default: "Змінити пароль"),
+              class: "w-full bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded font-semibold" %>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="text-center mt-4">
+      <%= render "devise/shared/links" %>
+    </div>
+  </div>
+</body>

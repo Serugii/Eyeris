@@ -1,3 +1,3 @@
 class DeviseControllerWithLayout < Devise::SessionsController
-  layout 'application'
+  layout "application"
 end

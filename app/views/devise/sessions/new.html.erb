@@ -2,7 +2,7 @@
   <div class="max-w-md mx-auto mt-10 bg-white p-8 rounded shadow min-h-[550px] flex flex-col justify-between">
     <div class="text-xl font-bold text-center mb-4 hover:underline"><%= link_to 'Eyeris', root_path %></div>
     <div>
-      <h2 class="text-3xl text-blue-600 font-bold mb-6 text-center">
+      <h2 class="text-3xl text-sky-400 font-bold mb-6 text-center">
         <%= t("devise.sessions.new.title", default: "Вхід") %>
       </h2>
       <% if flash[:alert] %>
@@ -41,7 +41,7 @@
 
 
         <div class="mb-6">
-          <%= f.submit "Увійти", class: "w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded font-semibold" %>
+          <%= f.submit "Увійти", class: "w-full bg-sky-400 hover:bg-sky-500 text-white py-2 px-4 rounded font-semibold" %>
         </div>
       <% end %>
     </div>

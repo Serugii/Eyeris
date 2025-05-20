@@ -1,0 +1,35 @@
+<main class="max-w-4xl mx-auto p-6">
+  <div class="bg-white rounded-xl shadow-lg p-8 text-center">
+    <p class="text-lg text-gray-700 mb-6">
+      Це сторінка доступних тестів та вправ. Ви тут можете перевірити свій зір або обрати вправи для очей.
+    </p>
+    <div class="bg-white rounded-xl shadow p-6">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-4">Тести для перевірки зору</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <% tests = [
+            { path: vision_sharpness_tests_path, image: "sharpness.png", label: "Тест на гостроту зору" },
+            { path: color_blindness_tests_path, image: "blind.png", label: "Тест на дальтонізм" },
+            { path: duochrome_test_path, image: "duochrome.png", label: "Дуохромний тест" },
+            { path: syvtsevs_table_test_path, image: "syvtsev.png", label: "Таблиця Сивцева" }
+          ] %>
+
+          <% tests.each do |test| %>
+            <%= link_to test[:path], class: "flex flex-col items-center bg-emerald-100 hover:bg-emerald-200 text-gray-800 font-semibold p-4 rounded-lg shadow transition space-y-3" do %>
+              <%= image_tag "tests/#{test[:image]}", alt: test[:label], class: "max-w-[120px] h-auto object-contain border border-emerald-300 rounded shadow-sm" %>
+              <span><%= test[:label] %></span>
+            <% end %>
+          <% end %>
+        </div>
+    </div>
+    <br>
+    <div class="bg-white rounded-xl shadow p-6">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-4">Вправи для очей</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-center">
+        <%= link_to "Вправи для відпочинку", relaxation_exercises_path,
+                class: "block bg-emerald-100 hover:bg-emerald-200 text-gray-800 font-semibold py-4 px-6 rounded-lg shadow transition" %>
+        <%= link_to "Вправи для відновлення зору", recovery_exercises_path,
+                class: "block bg-emerald-100 hover:bg-emerald-200 text-gray-800 font-semibold py-4 px-6 rounded-lg shadow transition" %>
+        </div>
+    </div>
+  </div>
+</main>

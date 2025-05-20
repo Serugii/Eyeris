@@ -1,0 +1,123 @@
+<main class="max-w-4xl mx-auto p-6 space-y-6">
+  <div class="bg-white rounded-xl shadow-lg p-8 text-center space-y-6">
+    <!-- Step 1: Привітання -->
+    <div id="step-1">
+      <h1 class="text-2xl font-semibold text-gray-800">Дуохромний тест</h1>
+      <p class="text-gray-600">Цей тест допоможе оцінити, чи є у вас короткозорість або далекозорість. Натисніть "Почати", щоб розпочати.</p>
+      <button onclick="showStep(2)" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg shadow transition">Почати</button>
+    </div>
+
+    <!-- Step 2: Праве око -->
+    <div id="step-2" class="hidden">
+      <h2 class="text-xl font-semibold text-gray-800">Оцінка для правого ока</h2>
+      <%= image_tag "tests/duochrome.png", alt: "Дуохромний тест", class: "w-full max-w-md mx-auto rounded border shadow" %>
+
+      <div class="flex flex-wrap justify-center gap-4 mt-6">
+        <div>
+          <button onclick="setAnswer('right', 'red')" data-eye="right" data-value="red"
+            class="bg-amber-200 text-gray-800 font-semibold py-3 px-4 rounded-lg shadow transition">
+            Чіткіше на червоному
+          </button>
+        </div>
+        <div>
+          <button onclick="setAnswer('right', 'equal')" data-eye="right" data-value="equal"
+            class="bg-amber-200 text-gray-800 font-semibold py-3 px-4 rounded-lg shadow transition">
+            Однаково
+          </button>
+        </div>
+        <div>
+          <button onclick="setAnswer('right', 'green')" data-eye="right" data-value="green"
+            class="bg-amber-200 text-gray-800 font-semibold py-3 px-4 rounded-lg shadow transition">
+            Чіткіше на зеленому
+          </button>
+        </div>
+      </div>
+      <button onclick="showStep(3)" class="mt-6 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg shadow">Далі</button>
+    </div>
+
+    <!-- Step 3: Ліве око -->
+    <div id="step-3" class="hidden">
+      <h2 class="text-xl font-semibold text-gray-800">Оцінка для лівого ока</h2>
+      <%= image_tag "tests/duochrome.png", alt: "Дуохромний тест", class: "w-full max-w-md mx-auto rounded border shadow" %>
+
+      <div class="flex flex-wrap justify-center gap-4 mt-6">
+        <div>
+          <button onclick="setAnswer('left', 'red')" data-eye="left" data-value="red"
+            class="bg-amber-200 text-gray-800 font-semibold py-3 px-4 rounded-lg shadow transition">
+            Чіткіше на червоному
+          </button>
+        </div>
+        <div>
+          <button onclick="setAnswer('left', 'equal')" data-eye="left" data-value="equal"
+            class="bg-amber-200 text-gray-800 font-semibold py-3 px-4 rounded-lg shadow transition">
+            Однаково
+          </button>
+        </div>
+        <div>
+          <button onclick="setAnswer('left', 'green')" data-eye="left" data-value="green"
+            class="bg-amber-200 text-gray-800 font-semibold py-3 px-4 rounded-lg shadow transition">
+            Чіткіше на зеленому
+          </button>
+        </div>
+      </div>
+      <button onclick="showResult()" class="mt-6 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg shadow">Показати результат</button>
+    </div>
+
+    <!-- Step 4: Результат -->
+    <div id="step-4" class="hidden">
+      <h2 class="text-2xl font-semibold text-gray-800">Результат</h2>
+      <p id="result-text" class="text-gray-700 mt-4"></p>
+      <%= link_to "Повернутись до вправ", dashboard_path,
+          class: "mt-6 inline-block bg-orange-400 hover:bg-orange-500 text-white font-semibold py-3 px-6 rounded-lg shadow transition" %>
+    </div>
+  </div>
+</main>
+
+<script>
+  let answers = { right: null, left: null };
+
+  function showStep(step) {
+    for (let i = 1; i <= 4; i++) {
+      document.getElementById(`step-${i}`).classList.add('hidden');
+    }
+    document.getElementById(`step-${step}`).classList.remove('hidden');
+  }
+
+  function setAnswer(eye, value) {
+    answers[eye] = value;
+
+    // Знайдемо всі кнопки для цього ока та скинемо стилі
+    document.querySelectorAll(`[data-eye="${eye}"]`).forEach(btn => {
+      btn.classList.remove('bg-emerald-400', 'text-white');
+      btn.classList.add('bg-amber-200', 'text-gray-800');
+    });
+
+    // Підсвітимо вибрану кнопку
+    const selectedBtn = document.querySelector(`[data-eye="${eye}"][data-value="${value}"]`);
+    if (selectedBtn) {
+      selectedBtn.classList.remove('bg-amber-200', 'text-gray-800');
+      selectedBtn.classList.add('bg-emerald-400', 'text-white');
+    }
+  }
+
+  function showResult() {
+    let text = "";
+    if (answers.right && answers.left) {
+      text += "Праве око: " + interpret(answers.right) + "<br>";
+      text += "Ліве око: " + interpret(answers.left);
+    } else {
+      text = "Будь ласка, дайте відповіді для обох очей.";
+    }
+    document.getElementById("result-text").innerHTML = text;
+    showStep(4);
+  }
+
+  function interpret(value) {
+    switch (value) {
+      case "red": return "бачите краще на червоному — можлива короткозорість.";
+      case "green": return "бачите краще на зеленому — можлива далекозорість.";
+      case "equal": return "бачите однаково — зорове сприйняття в нормі.";
+      default: return "немає даних.";
+    }
+  }
+</script>

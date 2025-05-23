@@ -1,10 +1,9 @@
 require "active_support/core_ext/integer/time"
 
 Rails.application.configure do
-  config.assets.debug = true
-  config.assets.digest = false
-  config.assets.compile = true
+  # Settings specified here will take precedence over those in config/application.rb.
 
+  # Make code changes take effect immediately without server restart.
   config.enable_reloading = true
 
   # Do not eager load code on boot.

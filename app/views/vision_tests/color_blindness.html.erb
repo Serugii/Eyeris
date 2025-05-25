@@ -1,4 +1,26 @@
 <main class="max-w-4xl mx-auto p-6 space-y-6">
-  <div class="bg-white rounded-xl shadow-lg p-8 text-center">
-  </div>  
+  <div class="bg-white rounded-xl shadow-lg p-8 text-center min-h-[630px]">
+    <div class="text-left">
+      <h1 class="text-2xl font-semibold text-gray-800 text-center">Тест на дальтонізм</h1>
+      <div class="space-y-4 pl-4">
+        <p class="text-gray-700">
+          <strong>Тест на дальтонізм</strong> — це діагностичний інструмент, що використовується для 
+          виявлення порушень сприйняття кольору...
+        </p>
+      </div>
+      <%= image_tag "tests/colorBlindness.png", alt: "colorBlindness", class: "max-w-[400px] rounded border shadow mt-6 mx-auto"%>
+      <h2 class="text-lg font-semibold text-gray-800 mt-6 text-center">Вимоги до проходження</h2>
+      <ul class="list-disc text-left pl-6 text-gray-700 space-y-1">
+        <li>Збільште яскравість до 100%.</li>
+        <li>Обов’язково вимкніть фільтр синього світла.</li>
+        <li>Зніміть очки або контактні лінзи.</li>
+      </ul>
+      <div class="text-center mt-4">
+        <%= link_to "Почати тест", color_test_path,
+          class: "bg-orange-400 hover:bg-orange-500 text-white font-semibold py-3 px-6 rounded-lg shadow transition" %>
+        <%= link_to "Повернутись до вправ", dashboard_path,
+          class: "inline-block bg-emerald-400 hover:bg-emerald-500 text-white font-semibold py-3 px-6 rounded-lg shadow transition" %>
+      </div>
+    </div>
+  </div>
 </main>

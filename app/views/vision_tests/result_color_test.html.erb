@@ -1,0 +1,33 @@
+<main class="max-w-3xl mx-auto p-6 space-y-6">
+    <div class="bg-white rounded-xl shadow-lg p-8 text-center min-h-[630px]">
+        <h1 class="text-2xl font-bold text-gray-800 mb-6">Результати тесту на дальтонізм</h1>
+        <%= image_tag "tests/result.png", alt: "Результат", class: "max-w-[120px] mx-auto mt-4"%>
+        <p class="text-lg text-gray-700 mb-6 mt-4"><%= @feedback %></p>
+        <table class="table-auto mx-auto border border-gray-300">
+        <tbody>
+            <tr class="border-b">
+            <td class="px-4 py-2 font-semibold text-gray-700">Кількість питань:</td>
+            <td class="px-4 py-2"><%= @total %></td>
+            </tr>
+            <tr class="border-b">
+            <td class="px-4 py-2 font-semibold text-gray-700">Правильних відповідей:</td>
+            <td class="px-4 py-2 text-green-600"><%= @correct %></td>
+            </tr>
+            <tr class="border-b">
+            <td class="px-4 py-2 font-semibold text-gray-700">Неправильних відповідей:</td>
+            <td class="px-4 py-2 text-red-600"><%= @incorrect %></td>
+            </tr>
+            <tr>
+            <td class="px-4 py-2 font-semibold text-gray-700">Результат (%):</td>
+            <td class="px-4 py-2 text-gray-700 font-bold"><%= @percentage %>%</td>
+            </tr>
+        </tbody>
+        </table>
+        <div class="mt-6">
+            <%= link_to "Пройти ще раз", color_test_path,
+                class: "bg-orange-400 hover:bg-orange-500 text-white font-semibold py-3 px-6 rounded-lg shadow transition" %>
+            <%= link_to "Повернутись до вправ", dashboard_path,
+                class: "inline-block bg-emerald-400 hover:bg-emerald-500 text-white font-semibold py-3 px-6 rounded-lg shadow transition" %>
+        </div>
+    </div>
+</main>

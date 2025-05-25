@@ -1,4 +1,52 @@
 <main class="max-w-4xl mx-auto p-6 space-y-6">
   <div class="bg-white rounded-xl shadow-lg p-8 text-center">
+    <div class="text-left">
+      <h1 class="text-2xl font-semibold text-gray-800 text-center">Таблиця Сивцева</h1>
+      <div class="space-y-4 pl-4">
+        <p class="text-gray-700">
+          <strong>Таблиця Сивцева</strong> — це класичний офтальмологічний тест для перевірки гостроти зору. 
+          Вона містить ряди літер, які поступово зменшуються. Завдання користувача — визначити найменший рядок, 
+          який він може прочитати.
+        </p>
+      </div>
+      <h2 class="text-lg font-semibold text-gray-800 mt-6 text-center">Вимоги до проходження</h2>
+      <ul class="list-disc text-left pl-6 text-gray-700 space-y-1">
+        <li>Проходьте тест у добре освітленому приміщенні.</li>
+        <li>Сидіть прямо, екран має бути на рівні очей.</li>
+        <li>Відстань до екрана — 2,5 метра.</li>
+        <li>Спочатку закрийте одне око долонею (не заплющуйте).</li>
+        <li>Поступово читайте літери — зверху вниз — і запам’ятовуйте найнижчий рядок, який бачите чітко.</li>
+      </ul>
+      <div class="text-center mt-4">
+        <button onclick="document.getElementById('syvtsev-image').scrollIntoView({ behavior: 'smooth' });"
+          class="bg-orange-400 hover:bg-orange-500 text-white font-semibold py-3 px-6 rounded-lg shadow transition">
+          Перейти до таблиці
+        </button>
+      </div>
+      <%= image_tag "tests/syvtsev.png", alt: "Таблиця Сивцева", id: "syvtsev-image", class: "max-h-[calc(100vh-50px)] rounded border shadow mt-6 mx-auto"%>
+      <p class="text-gray-700 mt-2 text-left mt-4">
+        Поруч із кожним рядком таблиці розміщені дві позначки: <strong>V=</strong> та <strong>D=</strong>.
+      </p>
+      <ul class="list-disc pl-6 text-gray-700 mt-2 space-y-1">
+        <li>
+          <strong>V=</strong> — гострота зору. Наприклад, <strong>V=1.0</strong> означає нормальний зір, <strong>V=0.3</strong> — знижений.
+        </li>
+        <li>
+          <strong>D=</strong> — відстань (у метрах), з якої людина з нормальним зором має бачити цей рядок.
+        </li>
+      </ul>
+      <p class="text-gray-700 mt-2">
+        Якщо ви можете прочитати рядок із позначкою <strong>V=0.7</strong> — отже ваша гострота зору становить 0.7. 
+        <br>Результат <strong>V=1.0</strong> або вище вважається нормою. Якщо нижче — можливе зниження зору.
+      </p>
+      <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 text-yellow-800 text-sm mt-6 text-center">
+        Цей тест не замінює професійну діагностику. Зверніться до офтальмолога для точного результату.
+      </div>
+      <div class="text-center">
+        <%= link_to "Повернутись до вправ", dashboard_path,
+          class: "inline-block bg-emerald-400 hover:bg-emerald-500 text-white font-semibold py-3 px-6 rounded-lg 
+          shadow transition mt-4" %>
+      </div>
+    </div>
   </div>  
 </main>

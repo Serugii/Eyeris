@@ -1,0 +1,24 @@
+<main class="max-w-4xl mx-auto p-6 space-y-6">
+  <div class="bg-white rounded-xl shadow-lg p-8 text-center min-h-[630px]">
+    <div class="space-y-4">
+        <% if @index && @questions && @questions[@index] %>
+        <h2 class="text-xl font-semibold text-center">
+            Питання <%= @index + 1 %> з <%= @questions.size %>
+        </h2>
+        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 text-yellow-800 text-sm mt-4 text-center">
+            Запишіть правильний варіант, який ви бачите на зображенні.
+        </div>
+        <%= image_tag @questions[@index].image, class: "h-[400px] mx-auto rounded" %>
+        <div class="text-center mt-4">
+            <%= form_with url: check_color_test_path, method: :post, data: { turbo: false } do %>
+            <%= hidden_field_tag :question_index, @index %>
+            <%= text_field_tag :user_answer, "", placeholder: "Ваша відповідь", class: "border p-2 rounded" %>
+            <%= submit_tag "Далі", class: "bg-orange-400 hover:bg-orange-500 text-white py-2 px-4 rounded shadow mt-2" %>
+            <% end %>
+        </div>
+        <% else %>
+        <p class="text-red-600 text-center font-semibold">Помилка: не вдалося завантажити питання.</p>
+        <% end %>
+    </div>
+  </div>
+</main>

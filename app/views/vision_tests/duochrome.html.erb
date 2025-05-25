@@ -23,6 +23,8 @@
       <div class="text-center pt-4">
         <button onclick="showStep(2)" class="bg-orange-400 hover:bg-orange-500 text-white font-semibold py-3 
         px-6 rounded-lg shadow-md transition">Почати тестування</button>
+        <%= link_to "Повернутись до вправ", dashboard_path,
+          class: "inline-block bg-emerald-400 hover:bg-emerald-500 text-white font-semibold py-3 px-6 rounded-lg shadow transition" %>
       </div>
     </div>
     <div id="step-2" class="hidden">
@@ -106,7 +108,7 @@
           Спробувати знову
         </button>
         <%= link_to "Повернутись до вправ", dashboard_path,
-          class: "inline-block bg-orange-400 hover:bg-orange-500 text-white font-semibold py-3 px-6 rounded-lg shadow transition" %>
+          class: "inline-block bg-emerald-400 hover:bg-emerald-500 text-white font-semibold py-3 px-6 rounded-lg shadow transition" %>
       </div>
     </div>
   </div>

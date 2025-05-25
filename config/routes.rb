@@ -14,6 +14,10 @@ Rails.application.routes.draw do
   get "relaxation_exercises", to: "exercises#relaxation", as: :relaxation_exercises
   get "recovery_exercises", to: "exercises#recovery", as: :recovery_exercises
 
+  get  "color_test",          to: "vision_tests#color_test"
+  post "check_color_test",    to: "vision_tests#check_color_test"
+  get  "result_color_test",   to: "vision_tests#result_color_test"
+
   root "home#index"
   match "*unmatched", to: "application#redirect_to_root", via: :all
 end

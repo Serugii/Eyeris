@@ -6,6 +6,34 @@ class VisionTestsController < ApplicationController
   end
 
   def duochrome
+    @step = params[:step] || "start"
+  end
+
+  def duochrome_answer
+    if params[:answer].blank?
+      flash[:alert] = "Помилка! Будь ласка, оберіть варіант перед переходом далі."
+      return redirect_to duochrome_test_path(step: params[:eye])
+    end
+    session[:duochrome] ||= {}
+    session[:duochrome][params[:eye]] = params[:answer]
+    if params[:eye] == "right"
+      redirect_to duochrome_test_path(step: "left")
+    else
+      redirect_to result_duochrome_test_path
+    end
+  end
+
+  def result_duochrome_test
+    answers = session[:duochrome]
+    if answers.nil?
+      redirect_to duochrome_test_path, alert: "Сесію втрачено. Пройдіть тест заново."
+      return
+    end
+    @result = DuochromeResult.new(
+      right_answer: answers["right"],
+      left_answer: answers["left"]
+    )
+    session.delete(:duochrome)
   end
 
   def syvtsevs

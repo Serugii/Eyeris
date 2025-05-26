@@ -1,0 +1,41 @@
+<main class="max-w-3xl mx-auto p-6 space-y-6">
+  <div class="bg-white rounded shadow-xl p-8 text-center min-h-[630px]">
+    <h2 class="text-2xl font-semibold text-gray-800 text-center">Результат тестування</h2>
+    <%= image_tag "tests/result.png", alt: "Результат", class: "max-w-[120px] mx-auto mt-4" %>
+    <div class="text-gray-700 mt-6 text-base text-left max-w-2xl mx-auto space-y-4">
+        <div>
+            <% case @result.right_answer %>
+            <% when "red" %>
+            <strong>Праве око:</strong> Літери чіткіші на <span class="text-red-600 font-semibold">червоному фоні</span>. Це може свідчити про <strong>короткозорість</strong> (міопію).
+            <% when "green" %>
+            <strong>Праве око:</strong> Літери чіткіші на <span class="text-green-600 font-semibold">зеленому фоні</span>. Це може свідчити про <strong>далекозорість</strong> (гіперметропію).
+            <% when "equal" %>
+            <strong>Праве око:</strong> Літери видно однаково на обох фонах. Це може означати <strong>нормальний зір</strong>.
+            <% else %>
+            <strong>Праве око:</strong> Результат не визначено.
+            <% end %>
+        </div>
+        <div>
+            <% case @result.left_answer %>
+            <% when "red" %>
+            <strong>Ліве око:</strong> Літери чіткіші на <span class="text-red-600 font-semibold">червоному фоні</span>. Це може свідчити про <strong>короткозорість</strong> (міопію).
+            <% when "green" %>
+            <strong>Ліве око:</strong> Літери чіткіші на <span class="text-green-600 font-semibold">зеленому фоні</span>. Це може свідчити про <strong>далекозорість</strong> (гіперметропію).
+            <% when "equal" %>
+            <strong>Ліве око:</strong> Літери видно однаково на обох фонах. Це може означати <strong>нормальний зір</strong>.
+            <% else %>
+            <strong>Ліве око:</strong> Результат не визначено.
+            <% end %>
+        </div>
+    </div>
+    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 text-yellow-800 text-sm mt-6 text-center">
+      <strong>Зверніть увагу:</strong> Цей тест є орієнтовним. Для професійної діагностики рекомендуємо звернутися до офтальмолога.
+    </div>
+    <div class="text-center mt-6 space-y-4">
+      <%= link_to "Спробувати знову", duochrome_test_path,
+        class: "inline-block bg-amber-200 hover:bg-amber-300 text-gray-800 font-semibold py-3 px-6 rounded-lg shadow transition" %>
+      <%= link_to "Повернутись до вправ", dashboard_path,
+        class: "inline-block bg-emerald-400 hover:bg-emerald-500 text-white font-semibold py-3 px-6 rounded-lg shadow transition" %>
+    </div>
+  </div>
+</main>

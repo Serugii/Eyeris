@@ -18,6 +18,9 @@ Rails.application.routes.draw do
   post "check_color_test",    to: "vision_tests#check_color_test"
   get  "result_color_test",   to: "vision_tests#result_color_test"
 
+  post "duochrome_test/answer",    to: "vision_tests#duochrome_answer"
+  get  "duochrome_test/result",    to: "vision_tests#result_duochrome_test", as: :result_duochrome_test
+
   root "home#index"
   match "*unmatched", to: "application#redirect_to_root", via: :all
 end

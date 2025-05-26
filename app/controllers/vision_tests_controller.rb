@@ -2,6 +2,91 @@ class VisionTestsController < ApplicationController
   def sharpness
   end
 
+  def sharpness_start
+    steps = [
+      { image: "tests/sharpnesstest/up.png", answer: "up" },
+      { image: "tests/sharpnesstest/down.png", answer: "down" },
+      { image: "tests/sharpnesstest/left.png", answer: "left" },
+      { image: "tests/sharpnesstest/right.png", answer: "right" }
+    ]
+    sizes = [ 100, 90, 80, 70, 60, 50, 40, 30, 25, 20 ]
+    right_steps = sizes.map do |size|
+      step = steps.sample
+      { image: step[:image], answer: step[:answer], size: size }
+    end
+    left_steps = sizes.map do |size|
+      step = steps.sample
+      { image: step[:image], answer: step[:answer], size: size }
+    end
+    session[:sharpness_test_right] = right_steps
+    session[:sharpness_test_left] = left_steps
+    session[:sharpness_correct_right] = 0
+    session[:sharpness_correct_left] = 0
+    redirect_to sharpness_test_path(eye: "right", index: 0)
+  end
+
+  def sharpness_test
+    @eye = params[:eye]
+    @index = params[:index].to_i
+    data = session["sharpness_test_#{@eye}"]
+    redirect_to vision_sharpness_tests_path, alert: "Сесію втрачено" and return unless data
+    step_data = data[@index]
+    @step = SharpnessTestStep.new(
+      image: step_data["image"],
+      answer: step_data["answer"],
+      size: step_data["size"]
+    )
+  end
+
+  def sharpness_answer
+    eye = params[:eye]
+    index = params[:step_index].to_i
+    user_answer = params[:answer]
+    data = session["sharpness_test_#{eye}"]
+    redirect_to vision_sharpness_tests_path, alert: "Сесію втрачено" and return unless data
+    step_data = data[index]
+    step = SharpnessTestStep.new(image: step_data["image"], answer: step_data["answer"], size: step_data["size"])
+    if step.correct?(user_answer)
+      session["sharpness_correct_#{eye}"] += 1
+    end
+    if index + 1 < data.size
+      redirect_to sharpness_test_path(eye: eye, index: index + 1)
+    elsif eye == "right"
+      redirect_to sharpness_test_path(eye: "left", index: 0)
+    else
+      redirect_to sharpness_result_path
+    end
+  end
+
+  def sharpness_result
+    @total = 10
+    @right_score = session[:sharpness_correct_right] || 0
+    @left_score = session[:sharpness_correct_left] || 0
+    @right_percentage = (@right_score.to_f / @total * 100).round(1)
+    @left_percentage = (@left_score.to_f / @total * 100).round(1)
+    def calculate_sharpness(score)
+      case score
+      when 10 then "1.0 (норма)"
+      when 9 then "0.9"
+      when 8 then "0.8"
+      when 7 then "0.7"
+      when 6 then "0.6"
+      when 5 then "0.5"
+      when 4 then "0.4"
+      when 3 then "0.3"
+      when 2 then "0.2"
+      when 1 then "0.1"
+      else "0.0"
+      end
+    end
+    @right_sharpness = calculate_sharpness(@right_score)
+    @left_sharpness = calculate_sharpness(@left_score)
+    session.delete(:sharpness_test_right)
+    session.delete(:sharpness_test_left)
+    session.delete(:sharpness_correct_right)
+    session.delete(:sharpness_correct_left)
+  end
+
   def color_blindness
   end
 

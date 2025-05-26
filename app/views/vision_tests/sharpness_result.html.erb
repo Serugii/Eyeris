@@ -1,0 +1,36 @@
+<main class="max-w-3xl mx-auto p-6 space-y-6">
+  <div class="bg-white rounded-xl shadow-lg p-8 text-center min-h-[630px]">
+    <h1 class="text-2xl font-bold text-gray-800 mb-6">Результати тесту на гостроту зору</h1>
+    <%= image_tag "tests/result.png", alt: "Результат", class: "max-w-[120px] mx-auto mt-4" %>
+    <table class="table-auto mx-auto border border-gray-300 mt-6">
+      <thead class="bg-gray-100">
+        <tr>
+          <th class="px-4 py-2"></th>
+          <th class="px-4 py-2">Гострота зору</th>
+          <th class="px-4 py-2">Правильних відповідей (%)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="border-b">
+          <td class="px-4 py-2 font-semibold text-gray-700">Праве око</td>
+          <td class="px-4 py-2"><%= @right_sharpness %></td>
+          <td class="px-4 py-2 text-green-600 font-semibold"><%= @right_percentage %>%</td>
+        </tr>
+        <tr>
+          <td class="px-4 py-2 font-semibold text-gray-700">Ліве око</td>
+          <td class="px-4 py-2"><%= @left_sharpness %></td>
+          <td class="px-4 py-2 text-green-600 font-semibold"><%= @left_percentage %>%</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 text-yellow-800 text-sm mt-6 text-center">
+      Цей тест не замінює професійну діагностику. Зверніться до офтальмолога для точного результату.
+    </div>
+    <div class="mt-6 space-x-4">
+      <%= link_to "Пройти ще раз", sharpness_test_start_path,
+        class: "bg-orange-400 hover:bg-orange-500 text-white font-semibold py-3 px-6 rounded-lg shadow transition" %>
+      <%= link_to "Повернутись до вправ", dashboard_path,
+        class: "inline-block bg-emerald-400 hover:bg-emerald-500 text-white font-semibold py-3 px-6 rounded-lg shadow transition" %>
+    </div>
+  </div>
+</main>

@@ -9,10 +9,22 @@
   <% end %>
 <main class="max-w-4xl mx-auto p-6">
   <div class="bg-white rounded-xl shadow-lg p-8 text-center min-h-[630px]">
-    <h1 class="text-4xl font-bold mb-4">Ласкаво просимо на Eyeris 👁️</h1>
-    <p class="text-lg text-gray-700 mb-6">
-      Ваш персональний помічник для збереження та покращення зору.
-    </p>
+    <h1 class="text-4xl font-bold mb-4">Ласкаво просимо на Eyeris</h1>
+    <div class="text-left max-w-2xl mx-auto text-gray-800 mb-6 space-y-4">
+      <p>
+        На Eyeris ви можете пройти низку корисних тестів для оцінки стану вашого зору:
+      </p>
+      <ul class="list-disc list-inside space-y-1">
+        <li><strong>Тест на гостроту зору</strong> — допомагає оцінити, наскільки чітко ви бачите предмети на різній відстані.</li>
+        <li><strong>Тест на дальтонізм</strong> — виявляє можливі порушення кольоросприйняття.</li>
+        <li><strong>Таблиця Сивцева</strong> — класичний метод перевірки зору, адаптований для онлайн використання.</li>
+        <li><strong>Дуохромний тест</strong> — допомагає виявити наявність проблем із фокусуванням.</li>
+      </ul>
+      <p>
+        Окрім тестів, платформа також пропонує <strong>вправи для очей</strong>, які допоможуть зняти напруження 
+        після тривалої роботи за комп’ютером або гаджетами.
+      </p>
+    </div>
     <% if user_signed_in? %>
       <%= link_to "Перейти до вправ", dashboard_path,
             class: "bg-orange-400 hover:bg-orange-500 text-white font-semibold py-3 px-6 rounded-lg shadow transition" %>

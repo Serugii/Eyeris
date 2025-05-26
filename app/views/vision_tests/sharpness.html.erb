@@ -1,4 +1,30 @@
 <main class="max-w-4xl mx-auto p-6 space-y-6">
-  <div class="bg-white rounded-xl shadow-lg p-8 text-center">
+  <div class="bg-white rounded shadow-xl p-8 mx-auto min-h-[630px]">
+    <h1 class="text-2xl font-semibold text-gray-800 text-center">Тест на гостроту зору</h1>
+    <div class="space-y-4 pl-4">
+      <p class="text-gray-700">
+        Цей тест буде проходити в два етапи: для правого ока та для лівого. На цьому тесті вам буде показано кільце 
+        Ландольта, яке направлене в одну з 4 сторін. Це зображення зникне через 8 секунд після появи. Вам потрібно 
+        буде обрати один з 4 поданих варіантів, який був зображений на малюнку. Так повториьться декілька раз для 
+        обох очей, але з кожним разом зображення буде зменшуватись в розмірі.
+      </p>
+      <h2 class="text-lg font-semibold text-gray-800 mt-6 text-center">Вимоги до тесту</h2>
+      <ul class="list-disc pl-6 text-gray-700 space-y-1 pt-4 pb-4">
+        <li>Проходьте тест, коли почуваєтеся добре (не втомлені, не під впливом ліків або алкоголю).</li>
+        <li>Забезпечте достатнє освітлення в кімнаті.</li>
+        <li>Не нахиляйте голову та не жмуртесь очима під час проходження тесту.</li>
+        <li>Під час тестування, необхідне око закрийте долонею, не заплющуйте.</li>
+        <li>Відстань до екрану повинна бути приблизно 1.5 - 2 метри.</li>
+      </ul>
+    </div>
+    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 text-yellow-800 text-sm mt-6 text-center">
+      Цей тест не замінює професійну діагностику. Зверніться до офтальмолога для точного результату.
+    </div>
+    <div class="text-center pt-6 space-y-4 mt-4">
+      <%= link_to "Почати тест", sharpness_test_start_path,
+          class: "bg-orange-400 hover:bg-orange-500 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition" %>
+      <%= link_to "Повернутись до вправ", dashboard_path,
+          class: "inline-block bg-emerald-400 hover:bg-emerald-500 text-white font-semibold py-3 px-6 rounded-lg shadow transition" %>
+    </div>
   </div>  
 </main>

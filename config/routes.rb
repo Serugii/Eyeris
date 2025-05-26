@@ -21,6 +21,12 @@ Rails.application.routes.draw do
   post "duochrome_test/answer",    to: "vision_tests#duochrome_answer"
   get  "duochrome_test/result",    to: "vision_tests#result_duochrome_test", as: :result_duochrome_test
 
+  get "sharpness_test", to: "vision_tests#sharpness_test", as: :sharpness_test
+  get  "sharpness_test/start", to: "vision_tests#sharpness_start", as: :sharpness_test_start
+  post "sharpness_test/answer", to: "vision_tests#sharpness_answer", as: :sharpness_test_answer
+  get "sharpness_test/result", to: "vision_tests#sharpness_result", as: :sharpness_result
+
+
   root "home#index"
   match "*unmatched", to: "application#redirect_to_root", via: :all
 end

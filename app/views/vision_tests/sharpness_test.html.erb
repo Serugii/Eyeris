@@ -1,0 +1,41 @@
+<main class="max-w-4xl mx-auto p-6 space-y-6">
+  <div class="bg-white rounded shadow-xl p-8 mx-auto min-h-[630px]">
+    <% if @eye == "right" %>
+      <h1 class="text-2xl font-semibold text-gray-800 text-center mb-4">Тестування <u>правого</u> ока</h1>
+      <div class="bg-yellow-50 border-l-4 border-yellow-400 p-3 text-yellow-800 text-sm text-center">
+        Прикрийте долонею <strong>лівe</strong> око, не заплющуючи його. Оберіть напрямок кільця Ландольта.
+      </div>
+    <% else %>
+      <h1 class="text-2xl font-semibold text-gray-800 text-center mb-4">Тестування <u>лівого</u> ока</h1>
+      <div class="bg-yellow-50 border-l-4 border-yellow-400 p-3 text-yellow-800 text-sm text-center">
+        Прикрийте долонею <strong>праве</strong> око, не заплющуючи його. Оберіть напрямок кільця Ландольта.
+      </div>
+    <% end %>
+    <div class="flex items-center justify-center h-[260px]">
+      <%= image_tag @step.image, alt: "Кільце Ландольта",
+          class: "rounded transition-all duration-300",
+          style: "width: #{@step.size}px; height: #{@step.size}px;" %>
+    </div>
+    <%= form_with url: sharpness_test_answer_path, method: :post, class: "mt-4 text-center" do %>
+      <%= hidden_field_tag :eye, @eye %>
+      <%= hidden_field_tag :step_index, @index %>
+      <div class="flex flex-col items-center space-y-2">
+        <div>
+          <%= submit_tag "Вгору", name: "answer", value: "Up",
+              class: "bg-amber-400 hover:bg-amber-500 text-white font-medium py-2 px-4 rounded shadow transition w-60px h-40px" %>
+        </div>
+        <div class="flex items-center justify-between w-[200px]">
+          <%= submit_tag "Вліво", name: "answer", value: "Left",
+              class: "bg-amber-400 hover:bg-amber-500 text-white font-medium py-2 px-4 rounded shadow transition w-60px h-40px" %>
+          <div class="w-[100px]"></div>
+          <%= submit_tag "Вправо", name: "answer", value: "Right",
+              class: "bg-amber-400 hover:bg-amber-500 text-white font-medium py-2 px-4 rounded shadow transition w-60px h-40px" %>
+        </div>
+        <div>
+          <%= submit_tag "Вниз", name: "answer", value: "Down",
+              class: "bg-amber-400 hover:bg-amber-500 text-white font-medium py-2 px-4 rounded shadow transition w-60px h-40px" %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</main>

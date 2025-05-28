@@ -1,7 +1,322 @@
-<main class="max-w-4xl mx-auto p-6 space-y-6">
-  <div class="bg-white rounded-xl shadow-lg p-8 text-center">
-    <div class="text-xl font-bold mb-4 hover:underline">
-      <%= link_to 'Eyeris', root_path %>
+<main class="mx-auto space-y-6">
+  <div class="bg-white rounded-xl shadow-lg p-4 text-center min-h-[630px]">
+    <div class="flex justify-between items-center">
+      <%= link_to "Повернутись до вправ", dashboard_path,
+                  class: "inline-block bg-emerald-400 hover:bg-emerald-500 text-white font-semibold py-2 px-4 rounded-lg shadow transition" %>
+      <div id="timer" class="text-lg font-mono text-orange-500 font-bold bg-gray-100 border border-gray-300 px-4 py-2 rounded shadow">
+        00:00
+      </div>
+      <div id="skip-btn">
+        <button id="skip-button" disabled
+          onclick="skipExercise()"
+          class="bg-yellow-400 text-white font-semibold py-2 px-4 rounded-lg shadow transition
+                hover:bg-yellow-500
+                disabled:bg-yellow-500 disabled:hover:bg-yellow-500 disabled:opacity-70 disabled:cursor-not-allowed">
+          Пропустити вправу
+        </button>
+      </div>
     </div>
-  </div>  
+    <div id="exercise-container"
+     class="h-[500px] w-full overflow-hidden relative bg-gray-100 border border-gray-300 rounded-xl shadow mt-4 flex items-center justify-center">
+      <button id="start-btn"
+              onclick="startExercises()"
+              class="absolute bg-emerald-400 hover:bg-emerald-500 text-white font-bold py-3 px-6 rounded-lg shadow z-10">
+        Розпочати
+      </button>
+      <img id="eye-image" src="" alt="Очі"
+        class="hidden absolute w-32 h-32 object-contain transition-opacity duration-300 ease-in-out">
+      <div id="animated-circle"
+        class="hidden absolute top-0 left-0 w-16 h-16 bg-orange-500 rounded-full transition-transform duration-200 ease-in-out">
+      </div>
+      <div id="final-screen"
+          class="hidden absolute inset-0 flex-col justify-center items-center text-center space-y-4 bg-opacity-80 z-10">
+          <div class="flex absolute inset-0 flex-col justify-center items-center text-center space-y-4 bg-opacity-80 z-10">
+            <h2 class="text-xl font-bold text-green-600">Вправу завершено!</h2>
+            <p id="result-time" class="text-gray-700"></p>
+            <p id="result-date" class="text-gray-700"></p>
+            <p class="text-gray-700">✅ Ви успішно завершили вправу для очей!</p>
+            <button onclick="restartExercises()"
+                    class="bg-emerald-400 hover:bg-emerald-500 text-white py-2 px-4 rounded shadow">
+              Повторити вправу
+            </button>
+          </div>
+      </div>
+    </div>
+    <audio id="exercise-sound" src="<%= asset_path('ding.mp3') %>" preload="auto"></audio>
+    <div id="exercise-description"
+         class="bg-yellow-50 border-l-4 border-yellow-400 p-4 text-yellow-800 text-sm mt-6 text-center">
+      Перед початком вправ рекомендується зняти окуляри, розслабитися та зайняти зручну позу.
+    </div>
+  </div>
 </main>
+<script>
+  var current = 0;
+  var timerInterval = null;
+  var animationInterval = null;
+  var startTime = null;
+  var containerWidth, containerHeight;
+  window.addEventListener('beforeunload', () => {
+    clearInterval(timerInterval);
+    clearInterval(animationInterval);
+    localStorage.removeItem("exercisesRunning");
+  });
+  document.addEventListener('turbo:before-cache', () => {
+    clearInterval(timerInterval);
+    clearInterval(animationInterval);
+  });
+  document.addEventListener('turbo:load', () => {
+    clearInterval(timerInterval);
+    clearInterval(animationInterval);
+    localStorage.removeItem("exercisesRunning");
+    current = 0;
+    startTime = null;
+    const finalScreen = document.getElementById('final-screen');
+    if (finalScreen) finalScreen.classList.add('hidden');
+    const timer = document.getElementById('timer');
+    if (timer) timer.textContent = "00:00";
+    const skipButton = document.getElementById('skip-button');
+    if (skipButton) skipButton.disabled = true;
+    const circle = document.getElementById('animated-circle');
+    if (circle) circle.classList.add('hidden');
+    const eyeImage = document.getElementById('eye-image');
+    if (eyeImage) eyeImage.classList.add('hidden');
+    const startBtn = document.getElementById('start-btn');
+    if (startBtn) startBtn.classList.remove('hidden');
+  });
+  var exercises = <%= raw @exercises.map { |e|
+    {
+      name: e.name,
+      duration: e.duration,
+      type: e.type,
+      animation: e.animation,
+      description: e.description
+    }
+  }.to_json %>;
+  function startExercises() {
+    document.getElementById('start-btn').classList.add('hidden');
+    document.getElementById('skip-button').disabled = false;
+    localStorage.setItem("exercisesRunning", "true");
+    startTime = new Date();
+    runExercise();
+  }
+  function animateCircle(animationType) {
+    const circle = document.getElementById('animated-circle');
+    const container = document.getElementById('exercise-container');
+    containerWidth = container.clientWidth - circle.offsetWidth;
+    containerHeight = container.clientHeight - circle.offsetHeight;
+    let angle = 0, x = 0, y = 0;
+    clearInterval(animationInterval);
+    if (animationType === "focus_pop") {
+      animationInterval = setInterval(() => {
+        const radius = 16 + Math.random() * 48;
+        const maxX = container.clientWidth - radius;
+        const maxY = container.clientHeight - radius;
+        x = Math.random() * maxX;
+        y = Math.random() * maxY;
+        circle.style.transition = "all 0.3s ease-in-out";
+        circle.style.width = radius + "px";
+        circle.style.height = radius + "px";
+        circle.style.transform = `translate(${x}px, ${y}px)`;
+        circle.classList.remove('hidden');
+      }, 1000);
+      return;
+    }
+    if (animationType === "focus_shrink") {
+      let minSize = 8;
+      let maxSize = 56;
+      let size = maxSize;
+      let shrinking = true;
+      circle.style.transition = "all 1s linear";
+      animationInterval = setInterval(() => {
+        if (shrinking) {
+          size -= 8;
+          if (size <= minSize) {
+            shrinking = false;
+            size = maxSize;
+            const maxX = container.clientWidth - size;
+            const maxY = container.clientHeight - size;
+            x = Math.random() * maxX;
+            y = Math.random() * maxY;
+            circle.style.transform = `translate(${x}px, ${y}px)`;
+          }
+        } else {
+          shrinking = true;
+        }
+        circle.style.width = `${size}px`;
+        circle.style.height = `${size}px`;
+        circle.classList.remove('hidden');
+      }, 800);
+      return;
+    }
+    circle.style.transition = "transform 0.02s linear";
+    animationInterval = setInterval(() => {
+      switch (animationType) {
+        case "horizontal":
+          x = (Math.sin(angle) + 1) / 2 * containerWidth;
+          y = containerHeight / 2;
+          break;
+        case "vertical":
+          x = containerWidth / 2;
+          y = (Math.sin(angle) + 1) / 2 * containerHeight;
+          break;
+        case "diagonal_down":
+          x = (Math.sin(angle) + 1) / 2 * containerWidth;
+          y = (Math.sin(angle) + 1) / 2 * containerHeight;
+          break;
+        case "diagonal_up":
+          x = (Math.sin(angle) + 1) / 2 * containerWidth;
+          y = (1 - Math.sin(angle)) / 2 * containerHeight;
+          break;
+        case "circle_clockwise":
+          x = (Math.cos(angle) + 1) / 2 * containerWidth;
+          y = (Math.sin(angle) + 1) / 2 * containerHeight;
+          break;
+        case "circle_counter":
+          x = (Math.cos(-angle) + 1) / 2 * containerWidth;
+          y = (Math.sin(-angle) + 1) / 2 * containerHeight;
+          break;
+        case "horizontal_eight":
+          x = containerWidth / 2 + Math.sin(angle) * containerWidth * 0.45;
+          y = containerHeight / 2 + Math.sin(angle * 2) * containerHeight * 0.25;
+          break;
+        case "vertical_eight":
+          x = containerWidth / 2 + Math.sin(angle * 2) * containerWidth * 0.25;
+          y = containerHeight / 2 + Math.sin(angle) * containerHeight * 0.45;
+          break;
+        case "square": {
+          const padding = 40;
+          const fullWidth = container.clientWidth - circle.offsetWidth - padding * 2;
+          const fullHeight = container.clientHeight - circle.offsetHeight - padding * 2;
+          const side = Math.floor(angle) % 4;
+          const progress = angle % 1;
+          if (side === 0) {
+            x = padding + progress * fullWidth;
+            y = padding;
+          } else if (side === 1) {
+            x = padding + fullWidth;
+            y = padding + progress * fullHeight;
+          } else if (side === 2) {
+            x = padding + (1 - progress) * fullWidth;
+            y = padding + fullHeight;
+          } else {
+            x = padding;
+            y = padding + (1 - progress) * fullHeight;
+          }
+          angle += 0.02;
+          circle.style.transform = `translate(${x}px, ${y}px)`;
+          return;
+        }
+        default:
+          x = containerWidth / 2;
+          y = containerHeight / 2;
+      }
+      circle.style.transform = `translate(${x}px, ${y}px)`;
+      angle += 0.05;
+    }, 20);
+  }
+  function runExercise() {
+    const startBtn = document.getElementById('start-btn');
+    if (startBtn && !startBtn.classList.contains('hidden')) {
+      return;
+    }
+    if (current >= exercises.length) {
+      finishExercises();
+      return;
+    }
+    const exercise = exercises[current];
+    const circle = document.getElementById('animated-circle');
+    const eyeImage = document.getElementById('eye-image');
+    document.getElementById('exercise-description').innerHTML = `
+      <strong>${exercise.name}</strong><br>${exercise.description}`;
+    let duration = exercise.duration;
+    updateTimer(duration);
+    document.getElementById('skip-button').disabled = false;
+    clearInterval(animationInterval);
+    circle.classList.add('hidden');
+    eyeImage.classList.add('hidden');
+    const container = document.getElementById('exercise-container');
+    containerWidth = container.clientWidth - circle.offsetWidth;
+    containerHeight = container.clientHeight - circle.offsetHeight;
+    if (exercise.type === "move") {
+      circle.classList.remove('hidden');
+      animateCircle(exercise.animation);
+    } else if (exercise.type === "blink") {
+      let openSrc = "<%= image_path('tests/openEye.png') %>";
+      let closeSrc = "<%= image_path('tests/closeEye.png') %>";
+      let showOpen = true;
+      eyeImage.classList.remove('hidden');
+      eyeImage.src = openSrc;
+      animationInterval = setInterval(() => {
+        eyeImage.src = showOpen ? closeSrc : openSrc;
+        showOpen = !showOpen;
+      }, 500);
+    } else if (exercise.type === "close_eyes") {
+      eyeImage.src = "<%= image_path('tests/closeEye.png') %>";
+      eyeImage.classList.remove('hidden');
+    } else if (exercise.type === "static") {
+      circle.classList.remove('hidden');
+      circle.style.transform = `translate(${containerWidth / 2}px, ${containerHeight / 2}px)`;
+    }
+    if (exercise.animation === "focus_pop") {
+      circle.classList.remove('hidden');
+      animateCircle("focus_pop");
+    }
+    timerInterval = setInterval(() => {
+      duration--;
+      updateTimer(duration);
+      if (duration <= 0) {
+        clearInterval(timerInterval);
+        circle.style.width = "4rem";
+        circle.style.height = "4rem";
+        const sound = document.getElementById('exercise-sound');
+        if (sound) {
+          sound.currentTime = 0;
+          sound.play();
+        }
+        current++;
+        runExercise();
+      }
+    }, 1000);
+  }
+  function skipExercise() {
+    clearInterval(timerInterval);
+    clearInterval(animationInterval);
+    document.getElementById('skip-button').disabled = true;
+    document.getElementById('animated-circle').style.width = "4rem";
+    document.getElementById('animated-circle').style.height = "4rem";
+    current++;
+    runExercise();
+  }
+  function finishExercises() {
+    document.getElementById('skip-button').disabled = true;
+    const circle = document.getElementById('animated-circle');
+    circle.classList.add('hidden');
+    circle.style.width = "4rem";
+    circle.style.height = "4rem";
+    const eyeImage = document.getElementById('eye-image');
+    eyeImage.classList.add('hidden');
+    const endTime = new Date();
+    const elapsedMs = endTime - startTime;
+    const minutes = String(Math.floor(elapsedMs / 60000)).padStart(2, '0');
+    const seconds = String(Math.floor((elapsedMs % 60000) / 1000)).padStart(2, '0');
+    updateTimer(0);
+    document.getElementById('final-screen').classList.remove('hidden');
+    document.getElementById('result-time').textContent = `🕒 Час проходження: ${minutes}:${seconds}`;
+    document.getElementById('result-date').textContent = `📅 Дата: ${new Date().toLocaleString()}`;
+    document.getElementById('exercise-description').innerHTML = `
+      <strong>Дякуємо за виконання вправ!</strong><br>Регулярне виконання допоможе зберегти ваш зір здоровим.`;
+    current = 0;
+    startTime = null;
+    localStorage.removeItem("exercisesRunning");
+  }
+  function restartExercises() {
+    location.reload();
+  }
+  function updateTimer(seconds) {
+    const timerEl = document.getElementById('timer');
+    if (!timerEl) return;
+    const m = String(Math.floor(seconds / 60)).padStart(2, '0');
+    const s = String(seconds % 60).padStart(2, '0');
+    timerEl.textContent = `${m}:${s}`;
+  }
+</script>

@@ -42,6 +42,7 @@
           </div>
       </div>
     </div>
+    <audio id="exercise-sound" src="<%= asset_path('ding.mp3') %>" preload="auto"></audio>
     <div id="exercise-description"
          class="bg-yellow-50 border-l-4 border-yellow-400 p-4 text-yellow-800 text-sm mt-6 text-center">
       Перед початком вправ рекомендується зняти окуляри, розслабитися та зайняти зручну позу.
@@ -49,13 +50,39 @@
   </div>
 </main>
 <script>
-  window.addEventListener('load', () => {
-    if (localStorage.getItem("exercisesRunning") === "true") {
-      localStorage.removeItem("exercisesRunning");
-      location.reload();
-    }
+  var current = 0;
+  var timerInterval = null;
+  var animationInterval = null;
+  var startTime = null;
+  window.addEventListener('beforeunload', () => {
+    clearInterval(timerInterval);
+    clearInterval(animationInterval);
+    localStorage.removeItem("exercisesRunning");
   });
-  const exercises = <%= raw @exercises.map { |e|
+  document.addEventListener('turbo:before-cache', () => {
+    clearInterval(timerInterval);
+    clearInterval(animationInterval);
+  });
+  document.addEventListener('turbo:load', () => {
+    clearInterval(timerInterval);
+    clearInterval(animationInterval);
+    localStorage.removeItem("exercisesRunning");
+    current = 0;
+    startTime = null;
+    const finalScreen = document.getElementById('final-screen');
+    if (finalScreen) finalScreen.classList.add('hidden');
+    const timer = document.getElementById('timer');
+    if (timer) timer.textContent = "00:00";
+    const skipButton = document.getElementById('skip-button');
+    if (skipButton) skipButton.disabled = true;
+    const circle = document.getElementById('animated-circle');
+    if (circle) circle.classList.add('hidden');
+    const eyeImage = document.getElementById('eye-image');
+    if (eyeImage) eyeImage.classList.add('hidden');
+    const startBtn = document.getElementById('start-btn');
+    if (startBtn) startBtn.classList.remove('hidden');
+  });
+  var exercises = <%= raw @exercises.map { |e|
     {
       name: e.name,
       duration: e.duration,
@@ -64,18 +91,13 @@
       description: e.description  
     }
   }.to_json %>;
-  let current = 0;
-  let timerInterval;
-  let totalSeconds = 0;
-  let startTime;
-  function startExercises() {
+  window.startExercises = function () {
     document.getElementById('start-btn').classList.add('hidden');
     document.getElementById('skip-button').disabled = false;
     localStorage.setItem("exercisesRunning", "true");
     startTime = new Date();
     runExercise();
   }
-  let animationInterval;
   function animateCircle(animationType) {
     const circle = document.getElementById('animated-circle');
     const container = document.getElementById('exercise-container');
@@ -119,6 +141,11 @@
     }, 20);
   }
   function runExercise() {
+    if (!localStorage.getItem("exercisesRunning")) return;
+    const startBtn = document.getElementById('start-btn');
+    if (startBtn && !startBtn.classList.contains('hidden')) {
+      return;
+    }
     if (current >= exercises.length) {
       finishExercises();
       return;
@@ -134,6 +161,11 @@
       updateTimer(duration);
       if (duration <= 0) {
         clearInterval(timerInterval);
+        const sound = document.getElementById('exercise-sound');
+        if (sound) {
+          sound.currentTime = 0;
+          sound.play();
+        }
         current++;
         runExercise();
       }
@@ -161,13 +193,10 @@
       eyeImage.classList.remove('hidden');
     }
   }
-  function updateTimer(seconds) {
-    const m = String(Math.floor(seconds / 60)).padStart(2, '0');
-    const s = String(seconds % 60).padStart(2, '0');
-    document.getElementById('timer').textContent = `${m}:${s}`;
-  }
   function skipExercise() {
     clearInterval(timerInterval);
+    clearInterval(animationInterval);
+    document.getElementById('skip-button').disabled = true;
     document.getElementById('skip-button').disabled = true;
     current++;
     runExercise();
@@ -187,9 +216,18 @@
     document.getElementById('result-date').textContent = `📅 Дата: ${new Date().toLocaleString()}`;
     document.getElementById('exercise-description').innerHTML = `
       <strong>Дякуємо за виконання вправ!</strong><br>Регулярне виконання допоможе зберегти ваш зір здоровим.`;
+    current = 0;
+    startTime = null;
     localStorage.removeItem("exercisesRunning");
   }
   function restartExercises() {
     location.reload();
+  }
+  function updateTimer(seconds) {
+    const timerEl = document.getElementById('timer');
+    if (!timerEl) return;
+    const m = String(Math.floor(seconds / 60)).padStart(2, '0');
+    const s = String(seconds % 60).padStart(2, '0');
+    timerEl.textContent = `${m}:${s}`;
   }
 </script>

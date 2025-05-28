@@ -4,5 +4,6 @@ class ExercisesController < ApplicationController
   end
 
   def recovery
+    @exercises = RecoveryExercise.sequence
   end
 end

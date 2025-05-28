@@ -1,7 +1,195 @@
-<main class="max-w-4xl mx-auto p-6 space-y-6">
-  <div class="bg-white rounded-xl shadow-lg p-8 text-center">
-    <div class="text-xl font-bold mb-4 hover:underline">
-      <%= link_to 'Eyeris', root_path %>
+<main class="mx-auto space-y-6">
+  <div class="bg-white rounded-xl shadow-lg p-4 text-center min-h-[630px]">
+    <div class="flex justify-between items-center">
+      <%= link_to "Повернутись до вправ", dashboard_path,
+                  class: "inline-block bg-emerald-400 hover:bg-emerald-500 text-white font-semibold py-2 px-4 rounded-lg shadow transition" %>
+      <div id="timer" class="text-lg font-mono text-orange-500 font-bold bg-gray-100 border border-gray-300 px-4 py-2 rounded shadow">
+        00:00
+      </div>
+      <div id="skip-btn">
+        <button id="skip-button" disabled
+          onclick="skipExercise()"
+          class="bg-yellow-400 text-white font-semibold py-2 px-4 rounded-lg shadow transition
+                hover:bg-yellow-500
+                disabled:bg-yellow-500 disabled:hover:bg-yellow-500 disabled:opacity-70 disabled:cursor-not-allowed">
+          Пропустити вправу
+        </button>
+      </div>
     </div>
-  </div>  
+    <div id="exercise-container"
+     class="h-[500px] w-full overflow-hidden relative bg-gray-100 border border-gray-300 rounded-xl shadow mt-4 flex items-center justify-center">
+      <button id="start-btn"
+              onclick="startExercises()"
+              class="absolute bg-emerald-400 hover:bg-emerald-500 text-white font-bold py-3 px-6 rounded-lg shadow z-10">
+        Розпочати
+      </button>
+      <img id="eye-image" src="" alt="Очі"
+        class="hidden absolute w-32 h-32 object-contain transition-opacity duration-300 ease-in-out">
+      <div id="animated-circle"
+        class="hidden absolute top-0 left-0 w-16 h-16 bg-orange-500 rounded-full transition-transform duration-200 ease-in-out">
+      </div>
+      <div id="final-screen"
+          class="hidden absolute inset-0 flex-col justify-center items-center text-center space-y-4 bg-opacity-80 z-10">
+          <div class="flex absolute inset-0 flex-col justify-center items-center text-center space-y-4 bg-opacity-80 z-10">
+            <h2 class="text-xl font-bold text-green-600">Вправу завершено!</h2>
+            <p id="result-time" class="text-gray-700"></p>
+            <p id="result-date" class="text-gray-700"></p>
+            <p class="text-gray-700">✅ Ви успішно завершили вправу для очей!</p>
+            <button onclick="restartExercises()"
+                    class="bg-emerald-400 hover:bg-emerald-500 text-white py-2 px-4 rounded shadow">
+              Повторити вправу
+            </button>
+          </div>
+      </div>
+    </div>
+    <div id="exercise-description"
+         class="bg-yellow-50 border-l-4 border-yellow-400 p-4 text-yellow-800 text-sm mt-6 text-center">
+      Перед початком вправ рекомендується зняти окуляри, розслабитися та зайняти зручну позу.
+    </div>
+  </div>
 </main>
+<script>
+  window.addEventListener('load', () => {
+    if (localStorage.getItem("exercisesRunning") === "true") {
+      localStorage.removeItem("exercisesRunning");
+      location.reload();
+    }
+  });
+  const exercises = <%= raw @exercises.map { |e|
+    {
+      name: e.name,
+      duration: e.duration,
+      type: e.type,
+      animation: e.animation,
+      description: e.description  
+    }
+  }.to_json %>;
+  let current = 0;
+  let timerInterval;
+  let totalSeconds = 0;
+  let startTime;
+  function startExercises() {
+    document.getElementById('start-btn').classList.add('hidden');
+    document.getElementById('skip-button').disabled = false;
+    localStorage.setItem("exercisesRunning", "true");
+    startTime = new Date();
+    runExercise();
+  }
+  let animationInterval;
+  function animateCircle(animationType) {
+    const circle = document.getElementById('animated-circle');
+    const container = document.getElementById('exercise-container');
+    const containerWidth = container.clientWidth - circle.offsetWidth;
+    const containerHeight = container.clientHeight - circle.offsetHeight;
+    let angle = 0;
+    let x = 0, y = 0;
+    clearInterval(animationInterval);
+    animationInterval = setInterval(() => {
+      switch (animationType) {
+        case "horizontal":
+          x = (Math.sin(angle) + 1) / 2 * containerWidth;
+          y = containerHeight / 2;
+          break;
+        case "vertical":
+          x = containerWidth / 2;
+          y = (Math.sin(angle) + 1) / 2 * containerHeight;
+          break;
+        case "diagonal_down":
+          x = (Math.sin(angle) + 1) / 2 * containerWidth;
+          y = (Math.sin(angle) + 1) / 2 * containerHeight;
+          break;
+        case "diagonal_up":
+          x = (Math.sin(angle) + 1) / 2 * containerWidth;
+          y = (1 - Math.sin(angle)) / 2 * containerHeight;
+          break;
+        case "circle_clockwise":
+          x = (Math.cos(angle) + 1) / 2 * containerWidth;
+          y = (Math.sin(angle) + 1) / 2 * containerHeight;
+          break;
+        case "circle_counter":
+          x = (Math.cos(-angle) + 1) / 2 * containerWidth;
+          y = (Math.sin(-angle) + 1) / 2 * containerHeight;
+          break;
+        default:
+          x = containerWidth / 2;
+          y = containerHeight / 2;
+      }
+      circle.style.transform = `translate(${x}px, ${y}px)`;
+      angle += 0.05;
+    }, 20);
+  }
+  function runExercise() {
+    if (current >= exercises.length) {
+      finishExercises();
+      return;
+    }
+    const exercise = exercises[current];
+    document.getElementById('exercise-description').innerHTML = `
+      <strong>${exercise.name}</strong><br>${exercise.description}`;
+    let duration = exercise.duration;
+    updateTimer(duration);
+    document.getElementById('skip-button').disabled = false;
+    timerInterval = setInterval(() => {
+      duration--;
+      updateTimer(duration);
+      if (duration <= 0) {
+        clearInterval(timerInterval);
+        current++;
+        runExercise();
+      }
+    }, 1000);
+    const circle = document.getElementById('animated-circle');
+    const eyeImage = document.getElementById('eye-image');
+    clearInterval(animationInterval);
+    circle.classList.add('hidden');
+    eyeImage.classList.add('hidden');
+    if (exercise.type === "move") {
+      circle.classList.remove('hidden');
+      animateCircle(exercise.animation);
+    } else if (exercise.type === "blink") {
+      let openSrc = "<%= image_path('tests/openEye.png') %>";
+      let closeSrc = "<%= image_path('tests/closeEye.png') %>";
+      let showOpen = true;
+      eyeImage.classList.remove('hidden');
+      eyeImage.src = openSrc;
+      animationInterval = setInterval(() => {
+        eyeImage.src = showOpen ? closeSrc : openSrc;
+        showOpen = !showOpen;
+      }, 500);
+    } else if (exercise.type === "close_eyes") {
+      eyeImage.src = "<%= image_path('tests/closeEye.png') %>";
+      eyeImage.classList.remove('hidden');
+    }
+  }
+  function updateTimer(seconds) {
+    const m = String(Math.floor(seconds / 60)).padStart(2, '0');
+    const s = String(seconds % 60).padStart(2, '0');
+    document.getElementById('timer').textContent = `${m}:${s}`;
+  }
+  function skipExercise() {
+    clearInterval(timerInterval);
+    document.getElementById('skip-button').disabled = true;
+    current++;
+    runExercise();
+  }
+  function finishExercises() {
+    document.getElementById('skip-button').disabled = true;
+    document.getElementById('animated-circle').classList.add('hidden');
+    const eyeImage = document.getElementById('eye-image');
+    eyeImage.classList.add('hidden');
+    const endTime = new Date();
+    const elapsedMs = endTime - startTime;
+    const minutes = String(Math.floor(elapsedMs / 60000)).padStart(2, '0');
+    const seconds = String(Math.floor((elapsedMs % 60000) / 1000)).padStart(2, '0');
+    updateTimer(0);
+    document.getElementById('final-screen').classList.remove('hidden');
+    document.getElementById('result-time').textContent = `🕒 Час проходження: ${minutes}:${seconds}`;
+    document.getElementById('result-date').textContent = `📅 Дата: ${new Date().toLocaleString()}`;
+    document.getElementById('exercise-description').innerHTML = `
+      <strong>Дякуємо за виконання вправ!</strong><br>Регулярне виконання допоможе зберегти ваш зір здоровим.`;
+    localStorage.removeItem("exercisesRunning");
+  }
+  function restartExercises() {
+    location.reload();
+  }
+</script>

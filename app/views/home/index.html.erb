@@ -26,11 +26,23 @@
       </p>
     </div>
     <% if user_signed_in? %>
-      <%= link_to "Перейти до вправ", dashboard_path,
+      <%= link_to "Перейти до тестів і вправ", dashboard_path,
             class: "bg-orange-400 hover:bg-orange-500 text-white font-semibold py-3 px-6 rounded-lg shadow transition" %>
+      <div class="mt-6 text-center">
+        <%= link_to "Вправи для відпочинку", relaxation_exercises_path,
+                class: "inline-block bg-emerald-400 hover:bg-emerald-500 text-white font-semibold py-3 px-6 rounded-lg shadow transition" %>
+        <%= link_to "Вправи для відновлення зору", recovery_exercises_path,
+                class: "inline-block bg-emerald-400 hover:bg-emerald-500 text-white font-semibold py-3 px-6 rounded-lg shadow transition" %>
+      </div>
     <% else %>
-      <%= link_to "Перейти до вправ", new_user_session_path,
+      <%= link_to "Перейти до тестів і вправ", new_user_session_path,
             class: "bg-orange-400 hover:bg-orange-500 text-white font-semibold py-3 px-6 rounded-lg shadow transition" %>
+      <div class="mt-6 text-center">
+        <%= link_to "Вправи для відпочинку", new_user_session_path,
+                class: "inline-block bg-emerald-400 hover:bg-emerald-500 text-white font-semibold py-3 px-6 rounded-lg shadow transition" %>
+        <%= link_to "Вправи для відновлення зору", new_user_session_path,
+                class: "inline-block bg-emerald-400 hover:bg-emerald-500 text-white font-semibold py-3 px-6 rounded-lg shadow transition" %>
+      </div>
     <% end %>
   </div>
 </main>

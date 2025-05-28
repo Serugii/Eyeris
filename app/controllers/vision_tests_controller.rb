@@ -3,21 +3,10 @@ class VisionTestsController < ApplicationController
   end
 
   def sharpness_start
-    steps = [
-      { image: "tests/sharpnesstest/up.png", answer: "up" },
-      { image: "tests/sharpnesstest/down.png", answer: "down" },
-      { image: "tests/sharpnesstest/left.png", answer: "left" },
-      { image: "tests/sharpnesstest/right.png", answer: "right" }
-    ]
+    directions = %w[up down left right]
     sizes = [ 100, 90, 80, 70, 60, 50, 40, 30, 25, 20 ]
-    right_steps = sizes.map do |size|
-      step = steps.sample
-      { image: step[:image], answer: step[:answer], size: size }
-    end
-    left_steps = sizes.map do |size|
-      step = steps.sample
-      { image: step[:image], answer: step[:answer], size: size }
-    end
+    right_steps = sizes.map { |size| [ directions.sample, size ] }
+    left_steps = sizes.map { |size| [ directions.sample, size ] }
     session[:sharpness_test_right] = right_steps
     session[:sharpness_test_left] = left_steps
     session[:sharpness_correct_right] = 0
@@ -30,12 +19,9 @@ class VisionTestsController < ApplicationController
     @index = params[:index].to_i
     data = session["sharpness_test_#{@eye}"]
     redirect_to vision_sharpness_tests_path, alert: "Сесію втрачено" and return unless data
-    step_data = data[@index]
-    @step = SharpnessTestStep.new(
-      image: step_data["image"],
-      answer: step_data["answer"],
-      size: step_data["size"]
-    )
+    direction, size = data[@index]
+    image = "tests/sharpnesstest/#{direction}.png"
+    @step = SharpnessTestStep.new(image: image, answer: direction, size: size)
   end
 
   def sharpness_answer
@@ -44,11 +30,9 @@ class VisionTestsController < ApplicationController
     user_answer = params[:answer]
     data = session["sharpness_test_#{eye}"]
     redirect_to vision_sharpness_tests_path, alert: "Сесію втрачено" and return unless data
-    step_data = data[index]
-    step = SharpnessTestStep.new(image: step_data["image"], answer: step_data["answer"], size: step_data["size"])
-    if step.correct?(user_answer)
-      session["sharpness_correct_#{eye}"] += 1
-    end
+    direction, size = data[index]
+    step = SharpnessTestStep.new(image: "tests/sharpnesstest/#{direction}.png", answer: direction, size: size)
+    session["sharpness_correct_#{eye}"] += 1 if step.correct?(user_answer)
     if index + 1 < data.size
       redirect_to sharpness_test_path(eye: eye, index: index + 1)
     elsif eye == "right"
@@ -124,74 +108,74 @@ class VisionTestsController < ApplicationController
   def syvtsevs
   end
 
+  IMAGE_ANSWERS = {
+    "tests/colorblindtest/1.png" => "1",
+    "tests/colorblindtest/2.png" => "2",
+    "tests/colorblindtest/3.png" => "3",
+    "tests/colorblindtest/4.png" => "4",
+    "tests/colorblindtest/5.png" => "5",
+    "tests/colorblindtest/6.png" => "6",
+    "tests/colorblindtest/7.png" => "7",
+    "tests/colorblindtest/8.png" => "8",
+    "tests/colorblindtest/9.png" => "9",
+    "tests/colorblindtest/1alt.png" => "1",
+    "tests/colorblindtest/2alt.png" => "2",
+    "tests/colorblindtest/3alt.png" => "3",
+    "tests/colorblindtest/4alt.png" => "4",
+    "tests/colorblindtest/5alt.png" => "5",
+    "tests/colorblindtest/6alt.png" => "6",
+    "tests/colorblindtest/6plus.png" => "6",
+    "tests/colorblindtest/7alt.png" => "7",
+    "tests/colorblindtest/8alt.png" => "8",
+    "tests/colorblindtest/9plus.png" => "9",
+    "tests/colorblindtest/9alt.png" => "9"
+  }.freeze
+
   def color_test
-    all_questions = [
-      Question.new(image: "tests/colorblindtest/1.png", correct_answer: "1"),
-      Question.new(image: "tests/colorblindtest/2.png", correct_answer: "2"),
-      Question.new(image: "tests/colorblindtest/3.png", correct_answer: "3"),
-      Question.new(image: "tests/colorblindtest/4.png", correct_answer: "4"),
-      Question.new(image: "tests/colorblindtest/5.png", correct_answer: "5"),
-      Question.new(image: "tests/colorblindtest/6.png", correct_answer: "6"),
-      Question.new(image: "tests/colorblindtest/7.png", correct_answer: "7"),
-      Question.new(image: "tests/colorblindtest/8.png", correct_answer: "8"),
-      Question.new(image: "tests/colorblindtest/9.png", correct_answer: "9"),
-      Question.new(image: "tests/colorblindtest/1alt.png", correct_answer: "1"),
-      Question.new(image: "tests/colorblindtest/2alt.png", correct_answer: "2"),
-      Question.new(image: "tests/colorblindtest/3alt.png", correct_answer: "3"),
-      Question.new(image: "tests/colorblindtest/4alt.png", correct_answer: "4"),
-      Question.new(image: "tests/colorblindtest/5alt.png", correct_answer: "5"),
-      Question.new(image: "tests/colorblindtest/6alt.png", correct_answer: "6"),
-      Question.new(image: "tests/colorblindtest/6plus.png", correct_answer: "6"),
-      Question.new(image: "tests/colorblindtest/7alt.png", correct_answer: "7"),
-      Question.new(image: "tests/colorblindtest/8alt.png", correct_answer: "8"),
-      Question.new(image: "tests/colorblindtest/9plus.png", correct_answer: "9"),
-      Question.new(image: "tests/colorblindtest/9alt.png", correct_answer: "9")
-    ]
-    @questions = all_questions.shuffle.first(20)
-    session[:questions] = @questions.map { |q| { image: q.image, correct_answer: q.correct_answer } }
-    session[:correct_answers] = 0
-    @index = 0
+  all_images = IMAGE_ANSWERS.keys.shuffle.first(20)
+  session[:question_images] = all_images
+  session[:correct_answers] = 0
+  @index = 0
+  @questions = all_images.map { |img| Question.new(image: img, correct_answer: IMAGE_ANSWERS[img]) }
   end
   def check_color_test
-    if session[:questions].nil?
+    if session[:question_images].nil?
       redirect_to color_test_path, alert: "Сесію втрачено, будь ласка, почніть тест заново."
       return
     end
-    questions = session[:questions].map { |q| Question.new(image: q["image"], correct_answer: q["correct_answer"]) }
+    question_images = session[:question_images]
     index = params[:question_index].to_i
     answer = params[:user_answer]
-    result = questions[index].correct?(answer)
-    if result
-      session[:correct_answers] ||= 0
-      session[:correct_answers] += 1
-    end
-    if index + 1 >= questions.size
+    current_image = question_images[index]
+    correct_answer = IMAGE_ANSWERS[current_image]
+    is_correct = (correct_answer.strip.downcase == answer.strip.downcase)
+    session[:correct_answers] ||= 0
+    session[:correct_answers] += 1 if is_correct
+    if index + 1 >= question_images.size
       redirect_to result_color_test_path
     else
-      @questions = questions
       @index = index + 1
+      @questions = question_images.map { |img| Question.new(image: img, correct_answer: IMAGE_ANSWERS[img]) }
       render :color_test
     end
   end
   def result_color_test
-    if session[:questions].nil? || session[:questions].empty?
-      redirect_to color_test_path, alert: "Сесію втрачено. Будь ласка, пройдіть тест заново."
-      return
-    end
-    @total = session[:questions].size
+    question_images = session[:question_images] || []
+    @total = question_images.size
     @correct = session[:correct_answers] || 0
     @incorrect = @total - @correct
     @percentage = (@correct.to_f / @total * 100).round(1)
-    if @percentage >= 90
-      @feedback = "Чудовий результат! Ваше сприйняття кольорів не викликає занепокоєння."
-    elsif @percentage >= 70
-      @feedback = "Непоганий результат. Можливо, є незначні труднощі зі сприйняттям деяких кольорів."
-    elsif @percentage >= 50
-      @feedback = "Середній результат. Рекомендується проконсультуватися з офтальмологом для точнішої діагностики."
-    else
-      @feedback = "Результат вказує на можливі проблеми з кольоровим зором. Бажано пройти професійне обстеження."
-    end
-    session.delete(:questions)
+    @feedback =
+      if @percentage >= 90
+        "Чудовий результат! Ваше сприйняття кольорів не викликає занепокоєння."
+      elsif @percentage >= 70
+        "Непоганий результат. Можливо, є незначні труднощі зі сприйняттям деяких кольорів."
+      elsif @percentage >= 50
+        "Середній результат. Рекомендується проконсультуватися з офтальмологом для точнішої діагностики."
+      else
+        "Результат вказує на можливі проблеми з кольоровим зором. Бажано пройти професійне обстеження."
+      end
+    session.delete(:question_images)
     session.delete(:correct_answers)
   end
 end

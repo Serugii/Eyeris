@@ -24,11 +24,17 @@
     <br>
     <div class="bg-white rounded-xl shadow p-6">
         <h2 class="text-2xl font-semibold text-gray-800 mb-4">Вправи для очей</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-center">
-        <%= link_to "Вправи для відпочинку", relaxation_exercises_path,
-                class: "block bg-emerald-100 hover:bg-emerald-200 text-gray-800 font-semibold py-4 px-6 rounded-lg shadow transition" %>
-        <%= link_to "Вправи для відновлення зору", recovery_exercises_path,
-                class: "block bg-emerald-100 hover:bg-emerald-200 text-gray-800 font-semibold py-4 px-6 rounded-lg shadow transition" %>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <% exercises = [
+            { path: relaxation_exercises_path, image: "relaxion.png", label: "Вправи для відпочинку" },
+            { path: recovery_exercises_path, image: "recovery.png", label: "Вправи для відновлення зору" }
+          ] %>
+          <% exercises.each do |exercise| %>
+            <%= link_to exercise[:path], class: "flex flex-col items-center bg-emerald-100 hover:bg-emerald-200 text-gray-800 font-semibold p-4 rounded-lg shadow transition space-y-3" do %>
+              <%= image_tag "tests/#{exercise[:image]}", alt: exercise[:label], class: "max-w-[120px] h-auto object-contain border border-emerald-300 rounded shadow-sm" %>
+              <span><%= exercise[:label] %></span>
+            <% end %>
+          <% end %>
         </div>
     </div>
   </div>

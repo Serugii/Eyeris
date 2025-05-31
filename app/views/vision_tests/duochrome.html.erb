@@ -22,9 +22,9 @@
       </div>
       <div class="text-center pt-6 space-y-4 mt-4">
         <%= link_to "Почати тест", duochrome_test_path(step: "right"),
-            class: "bg-orange-400 hover:bg-orange-500 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition" %>
+            class: "bg-emerald-400 hover:bg-emerald-500 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition" %>
         <%= link_to "Повернутись до вправ", dashboard_path,
-            class: "inline-block bg-emerald-400 hover:bg-emerald-500 text-white font-semibold py-3 px-6 rounded-lg shadow transition" %>
+            class: "inline-block bg-orange-400 hover:bg-orange-500 text-white font-semibold py-3 px-6 rounded-lg shadow transition" %>
       </div>
     <% elsif @step == "right" || @step == "left" %>
       <h2 class="text-xl font-semibold text-gray-800 text-center">

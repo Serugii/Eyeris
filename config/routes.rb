@@ -26,6 +26,8 @@ Rails.application.routes.draw do
   post "sharpness_test/answer", to: "vision_tests#sharpness_answer", as: :sharpness_test_answer
   get "sharpness_test/result", to: "vision_tests#sharpness_result", as: :sharpness_result
 
+  post "exercise_sessions", to: "exercise_sessions#create", as: :exercise_sessions
+
   root "home#index"
   match "*unmatched", to: "application#redirect_to_root", via: :all
 end

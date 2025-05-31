@@ -1,8 +1,128 @@
-<body class="min-h-screen bg-gray-100 text-gray-900">
-    <div class="max-w-xl mx-auto mt-10 p-6 bg-white rounded shadow text-center space-y-6 min-h-[550px]">
-        <div class="text-xl font-bold text-center mb-4 hover:underline"><%= link_to 'Eyeris', root_path %></div>
-        <h2 class="text-2xl font-bold text-gray-800">Привіт, <%= current_user.email %>!</h2>
-        <div class="flex flex-col gap-4">
-        </div>
+<body class="min-h-screen bg-gradient-to-b from-gray-100 to-white text-gray-900 font-sans">
+  <div class="max-w-4xl mx-auto mt-10 space-y-10 px-4">
+    <div class="bg-white rounded-xl shadow-md p-8 space-y-6">
+      <h2 class="text-4xl font-bold text-gray-800 text-center">Привіт, <%= current_user.email %>!</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-700 text-lg">
+        <p><strong>Дата реєстрації:</strong> <%= current_user.created_at.strftime("%d.%m.%Y %H:%M") %></p>
+        <p><strong>Загальний час вправ:</strong> <%= (@total_duration / 60.0).round(1) %> хв</p>
+        <p><strong>Вправи для відпочинку:</strong> <%= (@rest_duration / 60.0).round(1) %> хв</p>
+        <p><strong>Вправи для відновлення:</strong> <%= (@recovery_duration / 60.0).round(1) %> хв</p>
+      </div>
     </div>
+    <div class="bg-white rounded-xl shadow-md p-8 space-y-6">
+        <div class="flex justify-between items-center flex-wrap gap-2">
+            <div>
+                <h3 class="text-2xl font-semibold text-gray-800">Активність</h3>
+                <% if @last_activity_date %>
+                <p class="text-sm text-gray-500">Остання активність: <%= @last_activity_date.strftime("%d.%m.%Y %H:%M") %></p>
+                <% else %>
+                <p class="text-sm text-gray-400 italic">Активність відсутня</p>
+                <% end %>
+            </div>
+            <div class="flex gap-2 items-center">
+                <button data-range="7" class="filter-btn px-3 py-1 bg-amber-400 text-white rounded hover:bg-amber-500 transition">7 днів</button>
+                <button data-range="30" class="filter-btn px-3 py-1 bg-amber-400 text-white rounded hover:bg-amber-500 transition">30 днів</button>
+                <button data-range="365" class="filter-btn px-3 py-1 bg-amber-400 text-white rounded hover:bg-amber-500 transition">Рік</button>
+                <button id="refreshChart" class="px-3 py-1 bg-emerald-400 text-white rounded hover:bg-emerald-500 transition">Оновити</button>
+            </div>
+        </div>
+      <div class="h-80 flex justify-center items-center">
+        <canvas id="activityChart" class="w-full max-w-full h-full"></canvas>
+      </div>
+    </div>
+  </div>
 </body>
+<script>
+  document.addEventListener("turbo:load", function () {
+    const rawData = <%= raw @activity_data.to_json %>;
+    const ctx = document.getElementById('activityChart').getContext('2d');
+    function getFilteredData(days) {
+      const now = new Date();
+      const cutoff = new Date(now.setDate(now.getDate() - days));
+      const entries = Object.entries(rawData).filter(([date]) => {
+        return new Date(date) >= cutoff;
+      }).sort(([a], [b]) => new Date(a) - new Date(b));
+
+      const labels = entries.map(([date]) => date);
+      const restCounts = entries.map(([, data]) => data.rest);
+      const recoveryCounts = entries.map(([, data]) => data.recovery);
+
+      return { labels, restCounts, recoveryCounts };
+    }
+    let chart;
+    function renderChart(days) {
+      const { labels, restCounts, recoveryCounts } = getFilteredData(days);
+      if (chart) chart.destroy();
+      chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: 'Вправи для відпочинку',
+              data: restCounts,
+              borderColor: 'rgb(59, 130, 246)',
+              backgroundColor: 'rgba(59, 130, 246, 0.2)',
+              fill: true,
+              tension: 0.4
+            },
+            {
+              label: 'Вправи для відновлення',
+              data: recoveryCounts,
+              borderColor: 'rgb(16, 185, 129)',
+              backgroundColor: 'rgba(16, 185, 129, 0.2)',
+              fill: true,
+              tension: 0.4
+            }
+          ]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                beginAtZero: true,
+                suggestedMax: 5,
+                ticks: {
+                    stepSize: 1
+                }
+                },
+                x: {
+                offset: true,
+                ticks: {
+                    autoSkip: true,
+                    maxTicksLimit: 10,
+                    maxRotation: 45,
+                    minRotation: 45
+                },
+                title: {
+                    display: true,
+                    text: 'Дата'
+                }
+                }
+            },
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                    label: function (tooltipItem) {
+                        const label = tooltipItem.dataset.label;
+                        const value = tooltipItem.raw;
+                        return `${label}: ${value}`;
+                    },
+                    }
+                }
+            }
+        }
+      });
+    }
+    renderChart(30);
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const days = parseInt(btn.getAttribute('data-range'));
+        renderChart(days);
+      });
+    });
+    document.getElementById('refreshChart').addEventListener('click', () => {
+        location.reload();
+    });
+  });
+</script>

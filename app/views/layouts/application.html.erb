@@ -18,22 +18,22 @@
 
   <body class="min-h-screen bg-[#fdf6e3] text-[#3e3e3e] font-sans">
     <nav class="bg-white shadow p-4 flex justify-between items-center min-h-[64px]">
-    <div class="text-xl font-bold text-center hover:underline"><%= link_to "Eyeris", root_path %></div>
-    <div class="flex items-center space-x-4">
-      <% if user_signed_in? %>
-        <span class="text-sm text-gray-800"><%= current_user.email %></span>
-        <%= link_to "Профіль", profile_path,
-              class: "bg-yellow-400 hover:bg-yellow-500 text-white font-semibold py-2 px-4 rounded transition" %>
-        <%= button_to "Вийти", destroy_user_session_path, method: :delete,
-              class: "bg-red-400 hover:bg-red-500 text-white font-semibold py-2 px-4 rounded transition" %>
-      <% else %>
-        <%= link_to "Увійти", new_user_session_path,
-              class: "bg-sky-400 hover:bg-sky-500 text-white font-semibold py-2 px-4 rounded transition" %>
-        <%= link_to "Реєстрація", new_user_registration_path,
-              class: "bg-emerald-400 hover:bg-emerald-500 text-white font-semibold py-2 px-4 rounded transition" %>
-      <% end %>
-    </div>
-  </nav>
+      <div class="text-xl font-bold text-center hover:underline"><%= link_to "Eyeris", root_path %></div>
+      <div class="flex items-center space-x-4">
+        <% if user_signed_in? %>
+          <span class="text-sm text-gray-800"><%= current_user.email %></span>
+          <%= link_to "Профіль", profile_path,
+                class: "bg-yellow-400 hover:bg-yellow-500 text-white font-semibold py-2 px-4 rounded transition" %>
+          <%= button_to "Вийти", destroy_user_session_path, method: :delete,
+                class: "bg-red-400 hover:bg-red-500 text-white font-semibold py-2 px-4 rounded transition" %>
+        <% else %>
+          <%= link_to "Увійти", new_user_session_path,
+                class: "bg-sky-400 hover:bg-sky-500 text-white font-semibold py-2 px-4 rounded transition" %>
+          <%= link_to "Реєстрація", new_user_registration_path,
+                class: "bg-emerald-400 hover:bg-emerald-500 text-white font-semibold py-2 px-4 rounded transition" %>
+        <% end %>
+      </div>
+    </nav>
     <main class="max-w-5xl mx-auto px-4 py-5">
       <%= yield %>
     </main>

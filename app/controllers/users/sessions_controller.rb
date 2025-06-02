@@ -1,7 +1,7 @@
 class Users::SessionsController < Devise::SessionsController
-  layout 'application'
+  layout "application"
 end
 
 class Users::RegistrationsController < Devise::RegistrationsController
-  layout 'application'
+  layout "application"
 end
